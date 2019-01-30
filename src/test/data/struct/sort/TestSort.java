@@ -3,7 +3,9 @@
  */
 package test.data.struct.sort;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -28,6 +30,8 @@ public class TestSort {
     private static final int STACK_TYPE = 0x07;     //堆排序
 
     private static final int MEGER_TYPE = 0x08;     //归并排序
+
+    private static final int BASIC_TYPE = 0x09;     //基数排序
 
     private int[] array = new int[]{34, 5, 3, 2, 78, 5, 88, 9, 12, 10, 5, 5};
 
@@ -326,6 +330,154 @@ public class TestSort {
     }
 
     /**
+     * 基数排序
+     * 思想:将数据按照个位，十位，百位的顺序一次进行排序
+     * 34, 5, 3, 2, 78, 5, 88, 9, 12, 10, 5, 5
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public void basicSort(){
+        int[] newArray = array.clone();
+        if(newArray.length <= 1 || newArray == null){
+            return;
+        }
+        List<ArrayList> list = new ArrayList<ArrayList>();
+        int max = newArray[0];
+        for(int e : newArray){  //拿到数组中的最大值
+            if(max < e){
+                max = e;
+            }
+        }
+        int times = 0;
+        while(max > 0){     //根据最大值计算需要进行几次基数排列
+            max = max / 10;
+            times++;
+        }
+        for(int i = 0; i < 10; i++){    //创建一个添加10个动态数组
+            ArrayList array = new ArrayList<>();
+            list.add(array);
+        }
+        for(int exp = 0; exp < times; exp++){     //进行基数排序
+            //根据对应计算的基数，将其按位置进行安放
+            for(int i = 0; i < newArray.length; i++){
+                //获取对应的位数，exp为0获取个位，为1获取十位，为2获取千位
+                int x = newArray[i]%(int)Math.pow(10, exp+1)/(int)Math.pow(10,exp);
+                ArrayList array = list.get(x);    //获取对应位数的存放的动态数组
+                array.add(newArray[i]); //根据对应位数上的数字，存放到对应的位置
+                list.set(x, array); //为何动态数组的元素是动态数组要进行此操作？
+            }
+          //依次从对应的动态数组中获取对应的值，重新放回数组中
+            int count = 0;
+            for(int k = 0; k < 10; k++){
+                while(list.get(k).size() > 0){
+                    newArray[count++] = (int) list.get(k).get(0);
+                    list.get(k).remove(0);
+                }
+            }
+        }
+        print(newArray,BASIC_TYPE,true);
+    }
+
+    /**
+     * 基数排序
+     * 负数依然可以正常排序
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public void negBasicSort(){
+        int[] newArray = array.clone();
+        if(newArray.length <= 1 || newArray == null){
+            return;
+        }
+        ArrayList<Integer> pos = new ArrayList<Integer>();
+        ArrayList<Integer> neg = new ArrayList<Integer>();
+        int m = 0, n = 0;
+        //划分数组，区分负数和正数
+        for(int i = 0; i < newArray.length; i++){
+            if(newArray[i] < 0){
+                neg.add(newArray[i]);
+            }else{
+                pos.add(newArray[i]);
+            }
+        }
+        int[] negArray = new int[neg.size()],posArray = new int[pos.size()];
+        for(int i = 0; i < neg.size(); i++){
+            negArray[i] = neg.get(i);
+        }
+        for(int i = 0; i < pos.size(); i++){
+            posArray[i] = pos.get(i);
+        }
+        //获取数组中的最大值
+        int posMax = posArray[0];
+        for(int i = 0; i < posArray.length; i ++){
+            if(posMax < posArray[i]){
+                posMax = posArray[i];
+            }
+        }
+        int negMax = negArray[0];
+        for(int i = 0; i < negArray.length; i++){
+            if(negMax < Math.abs(newArray[i])){
+                negMax = Math.abs(newArray[i]);
+            }
+        }
+        //获取需要进行基数遍历的次数
+        int posTimes = 0, negTimes = 0;
+        while(posMax > 0){
+            posMax /= 10;
+            posTimes++;
+        }
+        while(negMax > 0){
+            negMax /= 10;
+            negTimes++;
+        }
+        //创建二维数组
+        ArrayList<ArrayList> posList = new ArrayList<ArrayList>();
+        ArrayList<ArrayList> negList = new ArrayList<ArrayList>();
+        for(int i = 0; i < 10; i++){
+            ArrayList<Integer> array = new ArrayList<>();
+            posList.add(array);
+            negList.add(array);
+        }
+        //正数进行基数
+        for(int i = 0; i < posTimes; i++){
+            for(int j = 0; j < posArray.length; j++){
+                int x = posArray[j] % (int)(Math.pow(10, i+1)) / (int)(Math.pow(10, i));
+                ArrayList q = posList.get(x);
+                q.add(posArray[j]);
+                posList.set(x, q);
+            }
+            int count = 0;
+            for(int k = 0; k < 10; k++){
+                while(posList.get(k).size() > 0){
+                    posArray[count++] = (int) posList.get(k).get(0);
+                    posList.get(k).remove(0);
+                }
+            }
+        }
+        //负数排序
+        for(int i = 0; i < negTimes; i++){
+            for(int j = 0; j < negArray.length; j++){
+                int x = Math.abs(negArray[j]) % (int)(Math.pow(10, i+1)) / (int)(Math.pow(10, i));
+                ArrayList q = negList.get(x);
+                q.add(negArray[j]);
+                negList.set(x,q);
+            }
+            int count = 0;
+            for(int k = 0; k < 10; k++){
+                while(negList.get(k).size() > 0){
+                    negArray[count++] = (int) negList.get(k).get(0);
+                    negList.get(k).remove(0);
+                }
+            }
+        }
+            int temp = 0;
+            for(int x = negArray.length; x > 0;x--){
+                newArray[temp++] = negArray[x-1];
+            }
+            for(int y = 0; y < posArray.length; y++){
+                newArray[temp++] = posArray[y];
+        }
+        print(newArray, BASIC_TYPE, true);
+    }
+    /**
      * 遍历排序
      * h: true
      * v: false
@@ -356,6 +508,10 @@ public class TestSort {
             break;
         case MEGER_TYPE:
             print(array,"meger",hv);
+            break;
+        case BASIC_TYPE:
+            print(array,"basic",hv);
+            break;
         default:
             break;
         }
