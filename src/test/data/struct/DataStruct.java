@@ -18,6 +18,8 @@ public class DataStruct {
         sort.heerSort();
         sort.stackSOrt();
         sort.megerSort();
+        sort.basicSort();
+        sort.negBasicSort();
         //Ëã·¨ÔËËã End
     }
 
