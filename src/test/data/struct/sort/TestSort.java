@@ -336,6 +336,7 @@ public class TestSort {
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void basicSort(){
+        count = 0;
         int[] newArray = array.clone();
         if(newArray.length <= 1 || newArray == null){
             return;
@@ -383,6 +384,7 @@ public class TestSort {
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void negBasicSort(){
+        count = 0;
         int[] newArray = array.clone();
         if(newArray.length <= 1 || newArray == null){
             return;
@@ -406,13 +408,20 @@ public class TestSort {
             posArray[i] = pos.get(i);
         }
         //获取数组中的最大值
-        int posMax = posArray[0];
+        int posMax = 0;
+        if(posArray.length > 0) {
+            posMax = posArray[0];
+        }
         for(int i = 0; i < posArray.length; i ++){
             if(posMax < posArray[i]){
                 posMax = posArray[i];
             }
         }
-        int negMax = negArray[0];
+        int negMax = 0;
+        if(negArray.length > 0) {
+           negMax = negArray[0];
+        }
+         
         for(int i = 0; i < negArray.length; i++){
             if(negMax < Math.abs(newArray[i])){
                 negMax = Math.abs(newArray[i]);
