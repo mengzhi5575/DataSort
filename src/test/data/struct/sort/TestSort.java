@@ -50,6 +50,7 @@ public class TestSort {
             for(int j = i+1; j < len; j++){
                 count++;
                 if(newarray[j] < min){
+                    min = newarray[j];
                     swapArrayNum(newarray, i, j);
                 }
             }
